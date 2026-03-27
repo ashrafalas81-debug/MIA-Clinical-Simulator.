@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>MIA Clinical Simulator</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; border-radius: 15px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #0056b3; }
+        #timer { color: red; font-weight: bold; font-size: 20px; }
+        #feedback { margin-top: 20px; font-weight: bold; color: green; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Medical Intelligence Academy</h2>
+        <p>بإشراف د. أشرف علاء مصطفى</p>
+        <hr>
+        <div id="timer">الوقت المتبقي: 10:00</div>
+        <div id="game-area">
+            <h3>الحالة الأولى: مريض يعاني من وجع حاد بالركبة</h3>
+            <p id="patient-talk">"يا دكتور ركبتي وجعاني أوي ومش قادر أفردها من ساعة الماتش!"</p>
+            <div id="actions">
+                <button class="btn" onclick="examine('Lachman')">عمل اختبار Lachman</button>
+                <button class="btn" onclick="examine('McMurray')">عمل اختبار McMurray</button>
+                <button class="btn" onclick="ask()">سؤال عن طريقة الإصابة</button>
+            </div>
+            <p id="result"></p>
+        </div>
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        let timeLeft = 600;
+        setInterval(() => {
+            if(timeLeft > 0) {
+                timeLeft--;
+                let min = Math.floor(timeLeft/60);
+                let sec = timeLeft % 60;
+                document.getElementById('timer').innerText = `الوقت المتبقي: ${min}:${sec < 10 ? '0'+sec : sec}`;
+            }
+        }, 1000);
+
+        function examine(test) {
+            if(test === 'Lachman') {
+                document.getElementById('result').innerText = "النتيجة: Positive (Soft End Point) - في حركة غير طبيعية للقصبة.";
+            } else {
+                document.getElementById('result').innerText = "النتيجة: Negative - الاختبار لم يعطِ استجابة.";
+            }
+        }
+
+        function ask() {
+            document.getElementById('patient-talk').innerText = '"كنت بجري ولفيت فجأة وسمعت صوت طقة (Pop) والركبة ورمت فوراً!"';
+        }
+    </script>
+</body>
+</html>
