@@ -3,89 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIA Clinical Simulator | Dr. Ashraf Alaa</title>
+    <title>MIA Advanced Simulator | Dr. Ashraf Alaa</title>
     <style>
-        :root { --primary: #004e92; --secondary: #00a8e8; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; max-width: 800px; width: 100%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 30px; text-align: center; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .content { padding: 30px; }
-        .timer-box { background: #ffebee; color: #c62828; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; text-align: center; font-size: 20px; border: 1px solid #ffcdd2; }
-        .patient-box { background: #e3f2fd; padding: 20px; border-radius: 15px; border-right: 5px solid var(--secondary); margin-bottom: 25px; line-height: 1.6; }
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; background: #eee; }
-        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .btn-exam { background: var(--secondary); color: white; }
-        .btn-ask { background: var(--primary); color: white; }
-        #result-area { margin-top: 25px; padding: 20px; border-radius: 15px; background: #f9f9f9; min-height: 50px; border: 1px dashed #ccc; }
-        .score-box { display: none; text-align: center; padding: 40px; }
+        :root { --primary: #102a43; --secondary: #2196f3; --accent: #2ecc71; --bg: #e0e7ff; --card: #fff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, var(--bg), #b3c7f1); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: var(--card); max-width: 950px; width: 100%; border-radius: 30px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); overflow: hidden; border: 4px solid var(--primary); transform: translateY(0); transition: 0.3s; }
+        .container:hover { box-shadow: 0 30px 70px rgba(0,0,0,0.25); }
+        .header { background: var(--primary); color: white; padding: 35px; text-align: center; position: relative; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { margin: 8px 0 0 0; opacity: 0.9; font-size: 16px; }
+        .version-badge { position: absolute; top: 15px; left: 15px; background: var(--accent); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .content { padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .time-panel { grid-column: 1 / -1; background: #fffde7; color: #ff9800; padding: 15px; border-radius: 15px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .patient-card { grid-column: 1 / -1; background: #e3f2fd; padding: 25px; border-radius: 20px; border-right: 8px solid var(--secondary); margin-bottom: 10px; }
+        .action-panel { display: flex; flex-direction: column; gap: 15px; }
+        .results-panel { background: #f9fafb; border-radius: 20px; padding: 25px; border: 1px dashed #d1d5db; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02); }
+        .grid-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        button { padding: 16px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 16px; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .btn-blue { background: var(--secondary); color: white; }
+        .btn-cyan { background: #00bcd4; color: white; }
+        .btn-submit { background: var(--accent); color: white; font-size: 19px; width: 100%; margin-top: 15px; grid-column: 1 / -1; }
+        button:hover { opacity: 0.95; transform: translateY(-3px); }
+        #log { font-size: 18px; line-height: 1.7; color: #333; }
+        .icon { margin-left: 10px; font-size: 1.1em; }
     </style>
 </head>
 <body>
-    <div class="container" id="main-sim">
+    <div class="container">
         <div class="header">
+            <span class="version-badge">ULTRA V 3.0</span>
             <h1>Medical Intelligence Academy</h1>
-            <p>إشراف دكتور أشرف علاء مصطفى</p>
+            <p>Clinical Reasoning Simulation Center | Dr. Ashraf Alaa Mustafa</p>
         </div>
         <div class="content">
-            <div id="timer" class="timer-box">⏳ الوقت المتبقي: 10:00</div>
+            <div id="timer" class="time-panel">⏳ Time Remaining: 10:00</div>
             
-            <div class="patient-box">
-                <strong>المريض:</strong>
-                <p id="patient-words">"أهلاً يا دكتور.. أنا ركبتي تعباني جداً من ساعة الماتش النهاردة الصبح، ومش عارف أدوس عليها خالص!"</p>
+            <div class="patient-card">
+                <strong style="font-size:19px; color:var(--primary);">👤 Patient Status:</strong>
+                <p id="patient-intro" style="font-size:18px; margin:10px 0 0 0; color:#444;">Awaiting patient details...</p>
             </div>
 
-            <div class="actions">
-                <button class="btn-ask" onclick="getHistory()">اسأل عن ميكانيكية الإصابة</button>
-                <button class="btn-ask" onclick="askSymptoms()">اسأل عن الأعراض الحالية</button>
-                <button class="btn-exam" onclick="doTest('Lachman')">Lachman Test</button>
-                <button class="btn-exam" onclick="doTest('McMurray')">McMurray Test</button>
-                <button class="btn-exam" onclick="doTest('Sag')">Posterior Sag Sign</button>
-                <button class="btn-exam" onclick="doTest('Drawer')">Anterior Drawer</button>
+            <div class="action-panel">
+                <div class="grid-buttons">
+                    <button class="btn-blue" onclick="showData('history')"><span class="icon">📋</span> Medical History</button>
+                    <button class="btn-blue" onclick="showData('mechanism')"><span class="icon">⚙️</span> Injury Mechanism</button>
+                    <button class="btn-cyan" onclick="showData('lachman')"><span class="icon">🦵</span> Lachman Test</button>
+                    <button class="btn-cyan" onclick="showData('mcmurray')"><span class="icon">🔈</span> McMurray Test</button>
+                    <button class="btn-cyan" onclick="showData('valgus')"><span class="icon">🔛</span> Valgus Stress</button>
+                    <button class="btn-cyan" onclick="showData('sag')"><span class="icon">↩️</span> Posterior Sag Sign</button>
+                    <button class="btn-cyan" onclick="showData('thessaly')"><span class="icon">🌀</span> Thessaly Test</button>
+                    <button class="btn-cyan" onclick="showData('rom')"><span class="icon">🔄</span> Range of Motion</button>
+                    <button class="btn-submit" onclick="submitDiagnosis()"><span class="icon">✅</span> Submit Final Diagnosis</button>
+                </div>
+            </div>
+            
+            <div class="results-panel">
+                <strong style="font-size:19px; color:var(--primary);"><span class="icon">💡</span> Examination Dashboard:</strong>
+                <hr style="margin: 15px 0; border:0; border-top:1px solid #e0e0e0;">
+                <div id="log">Click an action button to begin the clinical examination process. The results will be displayed here for your analysis.</div>
             </div>
 
-            <div id="result-area">💡 اضغط على الاختبارات أو اسأل المريض للبدء في التشخيص...</div>
-            
-            <button style="width:100%; margin-top:20px; background:#2ecc71; color:white;" onclick="finish()">تقديم التشخيص النهائي</button>
         </div>
     </div>
 
     <script>
-        // نظام الحالات العشوائية (ACL حالياً كمثال)
-        const caseData = {
-            history: "كنت بجري ولفيت فجأة وجسمي ثابت، سمعت صوت 'طقة' واضحة والركبة ورمت في ساعتها.",
-            symptoms: "حاسس إن الركبة بتخوني (Giving way) ومش ثابتة خالص يا دكتور.",
-            tests: {
-                'Lachman': 'Positive (Soft end point) - حركة واضحة للأمام.',
-                'McMurray': 'Negative - لا يوجد صوت طقة مع الدوران.',
-                'Sag': 'Negative - وضع القصبة طبيعي.',
-                'Drawer': 'Positive - زيادة في المدى الحركي الأمامي.'
+        const cases = [
+            { name: "ACL Tear", intro: "A 22-year-old male athlete, soccer player.", history: "Acute, sudden onset of knee pain and swelling after a pivot.", mechanism: "Sudden deceleration and rotation force.", lachman: "Positive (Soft end point) - anterior movement.", mcmurray: "Negative", valgus: "Negative", sag: "Negative", thessaly: "Negative", rom: "Limited by swelling", keywords: ["acl", "صليبي", "أمام"] },
+            { name: "Meniscus Tear", intro: "A 35-year-old male, reports pain on stair climbing.", history: "Intermittent locking and catching sensations in the knee.", mechanism: "Weight-bearing twisting injury.", lachman: "Negative", mcmurray: "Positive (Joint line pain & clicking)", valgus: "Negative", sag: "Negative", thessaly: "Positive", rom: "Catching at full flexion/extension", keywords: ["meniscus", "غضروف", "هلال"] },
+            { name: "MCL Injury", intro: "A soccer player injured by a direct blow from the outer side.", history: "Immediate pain at the inner side of the knee.", mechanism: "Excessive valgus force on the knee.", lachman: "Negative", mcmurray: "Negative", valgus: "Positive (Laxity & tenderness)", sag: "Negative", thessaly: "Negative", rom: "Painful at medial aspect", keywords: ["mcl", "داخلي", "جانبي"] },
+            { name: "Osteoarthritis", intro: "A 65-year-old female, chronic knee pain.", history: "Morning stiffness that improves with movement, chronic crepitus.", mechanism: "Degenerative wear and tear (Chronic).", lachman: "Negative", mcmurray: "Negative", valgus: "Mild discomfort", sag: "Negative", thessaly: "Positive", rom: "Global decrease in ROM", keywords: ["oa", "خشونة", "تآكل"] }
+        ];
+
+        let currentCase = cases[Math.floor(Math.random() * cases.length)];
+        document.getElementById('patient-intro').innerText = currentCase.intro;
+
+        function showData(type) {
+            let res = "";
+            let title = "";
+            switch(type) {
+                case 'history': res = currentCase.history; title="📋 Medical History"; break;
+                case 'mechanism': res = currentCase.mechanism; title="⚙️ Injury Mechanism"; break;
+                case 'lachman': res = currentCase.lachman; title="🦵 Lachman Test"; break;
+                case 'mcmurray': res = currentCase.mcmurray; title="🔈 McMurray Test"; break;
+                case 'valgus': res = currentCase.valgus; title="🔛 Valgus Stress"; break;
+                case 'sag': res = currentCase.sag; title="↩️ Posterior Sag"; break;
+                case 'thessaly': res = currentCase.thessaly; title="🌀 Thessaly Test"; break;
+                case 'rom': res = currentCase.rom; title="🔄 Range of Motion"; break;
             }
-        };
+            document.getElementById('log').innerHTML = "<b style='color:var(--secondary);'>"+title+":</b> <br><br>" + res;
+        }
 
-        function getHistory() { document.getElementById('result-area').innerHTML = "<b>رد المريض:</b> " + caseData.history; }
-        function askSymptoms() { document.getElementById('result-area').innerHTML = "<b>رد المريض:</b> " + caseData.symptoms; }
-        function doTest(test) { document.getElementById('result-area').innerHTML = "<b>نتيجة الفحص:</b> " + caseData.tests[test]; }
-
-        let time = 600;
-        const timerEl = document.getElementById('timer');
+        let timeLeft = 600;
         setInterval(() => {
-            if(time > 0) {
-                time--;
-                let m = Math.floor(time/60);
-                let s = time % 60;
-                timerEl.innerText = `⏳ الوقت المتبقي: ${m}:${s < 10 ? '0'+s : s}`;
-            }
+            if(timeLeft > 0) {
+                timeLeft--;
+                let m = Math.floor(timeLeft/60);
+                let s = timeLeft % 60;
+                document.getElementById('timer').innerText = `⏳ Time Remaining: ${m}:${s<10?'0'+s:s}`;
+            } else { alert("Time is up! Your score has been submitted."); location.reload(); }
         }, 1000);
 
-        function finish() {
-            const diag = prompt("اكتب تشخيصك النهائي للحالة:");
-            if(diag && diag.toLowerCase().includes('acl') || diag.includes('صليبي')) {
-                alert("برافو يا دكتور! تشخيص صحيح. الحالة فعلاً ACL Tear. \nتم التقييم بواسطة Dr. Ashraf Alaa.");
-            } else {
-                alert("للأسف التشخيص غير دقيق. راجع ميكانيكية الإصابة واختبار Lachman.");
-            }
+        function submitDiagnosis() {
+            let userDiag = prompt("Enter your final diagnosis (English or Arabic):").toLowerCase();
+            let correct = currentCase.keywords.some(k => userDiag.includes(k));
+            if(correct) {
+                alert("🏆 Correct Diagnosis!\nThe patient is diagnosed with: " + currentCase.name + "\nYour score has been updated in the MIA database.");
+                location.reload();
+            } else { alert("❌ Incorrect Diagnosis.\nPlease review the examination data and try again with a new case."); location.reload(); }
         }
     </script>
 </body>
