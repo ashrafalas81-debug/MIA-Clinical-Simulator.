@@ -3,114 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIA Clinical Simulator Ultra | Dr. Ashraf Alaa</title>
+    <title>MIA Ultimate Visual & Audio Simulator | Dr. Ashraf Alaa</title>
     <style>
-        :root { --primary: #0a192f; --secondary: #172a45; --accent: #64ffda; --text: #8892b0; --white: #e6f1ff; --bg: #020c1b; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .main-frame { background: var(--primary); width: 95vw; height: 90vh; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 2px solid var(--secondary); display: grid; grid-template-rows: 80px 1fr; overflow: hidden; }
-        .header { background: var(--secondary); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; border-bottom: 2px solid #1d3557; }
-        .header h1 { color: var(--white); margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
-        .header p { color: var(--accent); margin: 0; font-size: 14px; font-weight: bold; }
-        .game-area { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 30px; overflow-y: auto; }
-        .left-panel, .right-panel { display: flex; flex-direction: column; gap: 20px; }
-        .card { background: var(--secondary); border-radius: 15px; padding: 25px; border: 1px solid #1d3557; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .timer-card { text-align: center; color: #ff6b6b; font-size: 32px; font-weight: bold; font-family: monospace; }
-        .patient-card { border-right: 5px solid var(--accent); }
-        .patient-card h2 { color: var(--white); margin-top: 0; font-size: 18px; }
-        .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        button { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 18px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s ease; text-transform: uppercase; }
-        button:hover:not(:disabled) { background: rgba(100, 255, 218, 0.1); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2); }
+        :root { --primary: #0a192f; --secondary: #172a45; --accent: #64ffda; --white: #e6f1ff; --bg: #020c1b; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: #8892b0; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        .main-frame { background: var(--primary); width: 98vw; height: 95vh; border-radius: 20px; display: grid; grid-template-rows: 70px 1fr; border: 2px solid var(--secondary); box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        .header { background: var(--secondary); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; border-bottom: 2px solid #1d3557; }
+        .header h1 { color: var(--white); font-size: 22px; margin: 0; letter-spacing: 1px; }
+        .game-area { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; padding: 20px; overflow-y: auto; }
+        .visual-screen { background: #000; border-radius: 15px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 3px solid var(--secondary); position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(100, 255, 218, 0.1); }
+        .visual-screen img, .visual-screen video { width: 100%; height: 100%; object-fit: contain; }
+        .controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        button { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 13px; }
+        button:hover:not(:disabled) { background: rgba(100, 255, 218, 0.1); transform: scale(1.02); }
         button:disabled { border-color: #1d3557; color: #1d3557; cursor: not-allowed; }
-        .results-card { flex-grow: 1; display: flex; flex-direction: column; }
-        .results-card h2 { color: var(--white); margin-top: 0; border-bottom: 1px solid #1d3557; padding-bottom: 10px; }
-        #log-output { font-size: 18px; line-height: 1.8; color: var(--white); flex-grow: 1; overflow-y: auto; padding-right: 10px; }
-        .submit-btn { background: var(--accent); color: var(--primary); grid-column: 1 / -1; width: 100%; font-size: 18px; border: none; }
-        .submit-btn:hover { background: #fff; color: var(--primary); }
-        ::webkit-scrollbar { width: 8px; }
-        ::webkit-scrollbar-thumb { background: #1d3557; border-radius: 10px; }
+        .info-panel { display: flex; flex-direction: column; gap: 15px; }
+        .card { background: var(--secondary); padding: 20px; border-radius: 15px; border-right: 4px solid var(--accent); }
+        #log-output { color: var(--white); font-size: 17px; line-height: 1.6; min-height: 150px; }
+        .submit-btn { background: var(--accent); color: var(--primary); border: none; width: 100%; padding: 20px; font-size: 18px; margin-top: 10px; }
+        .timer { font-family: monospace; font-size: 28px; color: #ff6b6b; }
     </style>
 </head>
 <body>
     <div class="main-frame">
         <div class="header">
-            <div>
-                <h1>Medical Intelligence Academy</h1>
-                <p>Advanced Clinical Simulator | Dr. Ashraf Alaa</p>
-            </div>
-            <div class="timer-card" id="timer">10:00</div>
+            <h1>MEDICAL INTELLIGENCE ACADEMY | Dr. Ashraf Alaa</h1>
+            <div class="timer" id="timer">10:00</div>
         </div>
         <div class="game-area">
-            <div class="left-panel">
-                <div class="card patient-card">
-                    <h2>👤 حالة المريض الحالية:</h2>
-                    <p id="patient-intro" style="font-size:18px; color:var(--white);">جاري استلام بيانات المريض من الاستقبال...</p>
+            <div class="action-zone">
+                <div class="visual-screen" id="screen">
+                    <p style="color:#444;">[ Visual Feed Waiting... ]</p>
                 </div>
                 <div class="controls">
-                    <button id="btn-history" onclick="interact('history')">📋 التاريخ المرضي</button>
-                    <button id="btn-mech" onclick="interact('mechanism')">⚙️ ميكانيكية الإصابة</button>
-                    <button id="btn-lachman" onclick="interact('lachman')" disabled>🦵 Lachman Test</button>
-                    <button id="btn-mcmurray" onclick="interact('mcmurray')" disabled>🔈 McMurray Test</button>
-                    <button id="btn-valgus" onclick="interact('valgus')" disabled>🔛 Valgus Stress</button>
-                    <button id="btn-sag" onclick="interact('sag')" disabled>↩️ Posterior Sag</button>
-                    <button id="btn-rom" onclick="interact('rom')" disabled>🔄 Range of Motion</button>
-                    <button class="submit-btn" onclick="submitDiagnosis()">✅ تقديم التشخيص النهائي</button>
+                    <button onclick="playAction('history')">📋 History</button>
+                    <button onclick="playAction('mechanism')">⚙️ Mechanism</button>
+                    <button id="l-btn" onclick="playAction('lachman')" disabled>🦵 Lachman</button>
+                    <button id="m-btn" onclick="playAction('mcmurray')" disabled>🔈 McMurray</button>
+                    <button id="v-btn" onclick="playAction('valgus')" disabled>🔛 Valgus</button>
+                    <button id="s-btn" onclick="playAction('sag')" disabled>↩️ Sag Sign</button>
+                    <button id="t-btn" onclick="playAction('thessaly')" disabled>🌀 Thessaly</button>
+                    <button id="r-btn" onclick="playAction('rom')" disabled>🔄 ROM</button>
                 </div>
+                <button class="submit-btn" onclick="submitDiag()">✅ SUBMIT FINAL DIAGNOSIS</button>
             </div>
-            <div class="right-panel">
-                <div class="card results-card">
-                    <h2>💡 لوحة نتائج الفحص:</h2>
-                    <div id="log-output">
-                        مرحباً بك يا دكتور. المريض في انتظار تشخيصك الدقيق. ابدأ بجمع التاريخ المرضي وميكانيكية الإصابة لفتح باقي الاختبارات السريرية. بالتوفيق!
-                    </div>
+            <div class="info-panel">
+                <div class="card">
+                    <h3 style="margin:0; color:var(--accent);">👤 Patient Case:</h3>
+                    <p id="patient-intro" style="color:var(--white); margin-top:10px;">Loading...</p>
+                </div>
+                <div class="card" style="flex-grow:1;">
+                    <h3 style="margin:0; color:var(--accent);">💡 Clinical Logs:</h3>
+                    <div id="log-output">ابدأ بالفحص لجمع البيانات...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const allCases = [
-            { id: 1, name: "ACL Tear", intro: "لاعب كرة قدم شاب سقط أثناء مباراة.", history: "ألم حاد مفاجئ وصوت 'طق' مسموع داخل المفصل.", mechanism: "Sudden deceleration and pivot force.", lachman: "Positive: Soft end point.", mcmurray: "Negative", valgus: "Negative", sag: "Negative", rom: "Limited by swelling", keywords: ["acl", "صليبي", "أمام"] },
-            { id: 2, name: "Meniscus Tear", intro: "رجل في الـ 40 يعاني من ألم مزمن.", history: "ألم عند الصعود والنزول، وتصلب في خط المفصل (Joint line).", mechanism: "Twisting force on a weight-bearing knee.", lachman: "Negative", mcmurray: "Positive (Clicking/Pain)", valgus: "Negative", sag: "Negative", rom: "Catching at full flexion", keywords: ["meniscus", "غضروف", "هلال"] },
-            { id: 3, name: "MCL Injury", intro: "لاعب كرة تلقى ضربة مباشرة من الجانب الخارجي.", history: "ألم فوري وتورم في الجانب الداخلي للركبة.", mechanism: "Excessive valgus force on the knee.", lachman: "Negative", mcmurray: "Negative", valgus: "Positive (Laxity & Pain)", sag: "Negative", rom: "Painful at medial aspect", keywords: ["mcl", "داخلي", "جانبي"] },
-            { id: 4, name: "Osteoarthritis", intro: "سيدة تبلغ من العمر 70 عاماً تعاني من ألم مستمر.", history: "ألم مزمن يزداد سوءاً في نهاية اليوم وتصلب في الصباح.", mechanism: "Degenerative wear and tear (Chronic).", lachman: "Negative", mcmurray: "Negative", valgus: "Mild discomfort", sag: "Negative", rom: "Global decrease in ROM", keywords: ["oa", "خشونة", "تآكل"] },
-            { id: 5, name: "LCL Injury", intro: "مصارع أصيب أثناء تلاحم عنيف.", history: "ألم وتورم في الجانب الخارجي للركبة.", mechanism: "Excessive varus force on the knee.", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", rom: "Painful at lateral aspect", keywords: ["lcl", "خارجي", "جانبي"] },
-            { id: 6, name: "PCL Tear", intro: "حادث دراجة نارية واصطدام الركبة بالتابلوه.", history: "ألم عميق وتورم خلف الركبة.", mechanism: "Dashboard injury (Direct posterior force).", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Positive (Tibial sagging)", rom: "Painful at full flexion", keywords: ["pcl", "خلفي", "صليبي خلفي"] },
-            { id: 7, name: "Patellar Tendonitis", intro: "لاعب كرة سلة يشتكي من ألم في مقدمة الركبة.", history: "ألم تحت الصابونة (Patella) يزداد عند القفز والنزول.", mechanism: "Repetitive loading (Jumper's knee).", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", rom: "Normal, painful quadriceps contraction", keywords: ["patellar", "وتر", "صابونة"] },
-            { id: 8, name: "Baker's Cyst", intro: "مريض OA قديم لاحظ ورم خلف ركبته.", history: "ألم وشعور بالامتلاء خلف الركبة (Popliteal fossa).", mechanism: "Chronic effusion (OA or Meniscus related).", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", rom: "Limited full flexion", keywords: ["baker", "كيس", "خلف"] }
+        const cases = [
+            { name: "ACL Tear", intro: "A 22-year-old athlete with a sudden knee pop.", history: "ألم حاد مفاجئ وصوت طق في الركبة.", mechanism: "Sudden deceleration and pivot force.", lachman: "Positive: Soft end point.", mcmurray: "Negative", valgus: "Negative", sag: "Negative", thessaly: "Negative", rom: "Limited by swelling", keywords: ["acl", "صليبي", "أمام"], visual: "https://media.giphy.com/media/3o7TKMGpxV1mE8H704/giphy.gif" },
+            { name: "Meniscus Tear", intro: "A 35-year-old male with joint line pain.", history: "ألم عند الصعود والنزول وقفل في الركبة.", mechanism: "Twisting injury on a flexed knee.", lachman: "Negative", mcmurray: "Positive clicking.", valgus: "Negative", sag: "Negative", thessaly: "Positive", rom: "Catching at end range", keywords: ["meniscus", "غضروف"], visual: "https://media.giphy.com/media/l41lTfO3xS73Xp2aE/giphy.gif" },
+            { name: "PCL Tear", intro: "Dashboard injury after a car accident.", history: "ألم خلف الركبة وصعوبة في المشي.", mechanism: "Direct blow to the front of the tibia.", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Positive: Posterior Sag Sign.", thessaly: "Negative", rom: "Painful deep flexion", keywords: ["pcl", "خلفي"], visual: "" },
+            { name: "MCL Injury", intro: "Lateral blow to the knee during soccer.", history: "ألم في الجانب الداخلي للركبة.", mechanism: "Excessive Valgus force.", lachman: "Negative", mcmurray: "Negative", valgus: "Positive: Medial laxity.", sag: "Negative", thessaly: "Negative", rom: "Limited valgus range", keywords: ["mcl", "داخلي"], visual: "" },
+            { name: "Osteoarthritis", intro: "65-year-old female with chronic pain.", history: "خشونة وتصلب في الركبة خاصة في الصباح.", mechanism: "Degenerative wear and tear.", lachman: "Negative", mcmurray: "Negative", valgus: "Mild pain", sag: "Negative", thessaly: "Painful", rom: "Globally decreased", keywords: ["oa", "خشونة"], visual: "" },
+            { name: "LCL Injury", intro: "Wrestler with lateral knee pain.", history: "ألم في الجانب الخارجي للركبة.", mechanism: "Varus stress on the knee.", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", thessaly: "Negative", rom: "Lateral pain", keywords: ["lcl", "خارجي"], visual: "" },
+            { id: 7, name: "Patellar Tendonitis", intro: "Basketball player with anterior pain.", history: "ألم تحت الصابونة يزيد مع القفز.", mechanism: "Repetitive jumping (Jumper's knee).", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", thessaly: "Negative", rom: "Normal", keywords: ["patellar", "وتر", "صابونة"], visual: "" },
+            { id: 8, name: "Baker's Cyst", intro: "Swelling noticed behind the knee.", history: "شعور بالامتلاء وضغط خلف الركبة.", mechanism: "Chronic effusion (secondary to OA).", lachman: "Negative", mcmurray: "Negative", valgus: "Negative", sag: "Negative", thessaly: "Negative", rom: "Limited full flexion", keywords: ["baker", "كيس"], visual: "" }
         ];
 
-        let currentCase = allCases[Math.floor(Math.random() * allCases.length)];
-        document.getElementById('patient-intro').innerText = currentCase.intro;
+        let current = cases[Math.floor(Math.random() * cases.length)];
+        document.getElementById('patient-intro').innerText = current.intro;
 
-        function interact(type) {
+        function playAction(type) {
+            const screen = document.getElementById('screen');
             const log = document.getElementById('log-output');
-            let res = currentCase[type];
-            log.innerHTML = `<b style="color:var(--accent);">نتيجة الفحص:</b><br><br>${res}`;
-            
-            // تفعيل المرحلة التالية
+            let text = current[type];
+
+            // 1. Voice Output
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.lang = text.match(/[أ-ي]/) ? 'ar-SA' : 'en-US';
+            window.speechSynthesis.speak(msg);
+
+            // 2. Visual Output (If exists)
+            if(current.visual && (type==='history' || type==='mechanism')) {
+                screen.innerHTML = `<img src="${current.visual}">`;
+            } else {
+                screen.innerHTML = `<div style="padding:20px; text-align:center; color:var(--accent);">[ PERFORMING ${type.toUpperCase()} TEST ]</div>`;
+            }
+
+            // 3. Log Output
+            log.innerHTML = `<b style="color:var(--accent);">${type.toUpperCase()}:</b><br>${text}`;
+
+            // Unlock Tests
             if(type === 'history' || type === 'mechanism') {
-                document.querySelectorAll('.controls button:not(.submit-btn)').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('button').forEach(b => b.disabled = false);
             }
         }
 
-        let timeLeft = 600;
-        setInterval(() => {
-            if(timeLeft > 0) {
-                timeLeft--;
-                let m = Math.floor(timeLeft/60);
-                let s = timeLeft % 60;
-                document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
-            } else { alert("Time is up! Let's submit your final diagnosis."); submitDiagnosis(); }
-        }, 1000);
-
-        function submitDiagnosis() {
-            let diag = prompt("اكتب تشخيصك النهائي (بالعربي أو الإنجليزي):").toLowerCase();
-            let correct = currentCase.keywords.some(k => diag.includes(k));
-            if(correct) {
-                alert(`🏆 ممتاز يا دكتور! تشخيص صحيح. الحالة هي: ${currentCase.name}\nتم تسجيل نجاحك في أكاديمية MIA.`);
+        function submitDiag() {
+            let user = prompt("أدخل تشخيصك النهائي:").toLowerCase();
+            let win = current.keywords.some(k => user.includes(k));
+            if(win) {
+                alert("🏆 Correct! Diagnosis: " + current.name);
                 location.reload();
-            } else { alert(`❌ تشخيص غير دقيق. التشخيص الصحيح هو: ${currentCase.name}\nحاول مرة أخرى مع حالة جديدة!`); location.reload(); }
+            } else {
+                alert("❌ Wrong. It was: " + current.name);
+                location.reload();
+            }
         }
+
+        let time = 600;
+        setInterval(() => {
+            time--;
+            let m = Math.floor(time/60), s = time%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        }, 1000);
     </script>
 </body>
 </html>
