@@ -2,56 +2,90 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>MIA Clinical Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIA Clinical Simulator | Dr. Ashraf Alaa</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .card { background: white; border-radius: 15px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #0056b3; }
-        #timer { color: red; font-weight: bold; font-size: 20px; }
-        #feedback { margin-top: 20px; font-weight: bold; color: green; }
+        :root { --primary: #004e92; --secondary: #00a8e8; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; max-width: 800px; width: 100%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .timer-box { background: #ffebee; color: #c62828; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; text-align: center; font-size: 20px; border: 1px solid #ffcdd2; }
+        .patient-box { background: #e3f2fd; padding: 20px; border-radius: 15px; border-right: 5px solid var(--secondary); margin-bottom: 25px; line-height: 1.6; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; background: #eee; }
+        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .btn-exam { background: var(--secondary); color: white; }
+        .btn-ask { background: var(--primary); color: white; }
+        #result-area { margin-top: 25px; padding: 20px; border-radius: 15px; background: #f9f9f9; min-height: 50px; border: 1px dashed #ccc; }
+        .score-box { display: none; text-align: center; padding: 40px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Medical Intelligence Academy</h2>
-        <p>بإشراف د. أشرف علاء مصطفى</p>
-        <hr>
-        <div id="timer">الوقت المتبقي: 10:00</div>
-        <div id="game-area">
-            <h3>الحالة الأولى: مريض يعاني من وجع حاد بالركبة</h3>
-            <p id="patient-talk">"يا دكتور ركبتي وجعاني أوي ومش قادر أفردها من ساعة الماتش!"</p>
-            <div id="actions">
-                <button class="btn" onclick="examine('Lachman')">عمل اختبار Lachman</button>
-                <button class="btn" onclick="examine('McMurray')">عمل اختبار McMurray</button>
-                <button class="btn" onclick="ask()">سؤال عن طريقة الإصابة</button>
-            </div>
-            <p id="result"></p>
+    <div class="container" id="main-sim">
+        <div class="header">
+            <h1>Medical Intelligence Academy</h1>
+            <p>إشراف دكتور أشرف علاء مصطفى</p>
         </div>
-        <div id="feedback"></div>
+        <div class="content">
+            <div id="timer" class="timer-box">⏳ الوقت المتبقي: 10:00</div>
+            
+            <div class="patient-box">
+                <strong>المريض:</strong>
+                <p id="patient-words">"أهلاً يا دكتور.. أنا ركبتي تعباني جداً من ساعة الماتش النهاردة الصبح، ومش عارف أدوس عليها خالص!"</p>
+            </div>
+
+            <div class="actions">
+                <button class="btn-ask" onclick="getHistory()">اسأل عن ميكانيكية الإصابة</button>
+                <button class="btn-ask" onclick="askSymptoms()">اسأل عن الأعراض الحالية</button>
+                <button class="btn-exam" onclick="doTest('Lachman')">Lachman Test</button>
+                <button class="btn-exam" onclick="doTest('McMurray')">McMurray Test</button>
+                <button class="btn-exam" onclick="doTest('Sag')">Posterior Sag Sign</button>
+                <button class="btn-exam" onclick="doTest('Drawer')">Anterior Drawer</button>
+            </div>
+
+            <div id="result-area">💡 اضغط على الاختبارات أو اسأل المريض للبدء في التشخيص...</div>
+            
+            <button style="width:100%; margin-top:20px; background:#2ecc71; color:white;" onclick="finish()">تقديم التشخيص النهائي</button>
+        </div>
     </div>
 
     <script>
-        let timeLeft = 600;
+        // نظام الحالات العشوائية (ACL حالياً كمثال)
+        const caseData = {
+            history: "كنت بجري ولفيت فجأة وجسمي ثابت، سمعت صوت 'طقة' واضحة والركبة ورمت في ساعتها.",
+            symptoms: "حاسس إن الركبة بتخوني (Giving way) ومش ثابتة خالص يا دكتور.",
+            tests: {
+                'Lachman': 'Positive (Soft end point) - حركة واضحة للأمام.',
+                'McMurray': 'Negative - لا يوجد صوت طقة مع الدوران.',
+                'Sag': 'Negative - وضع القصبة طبيعي.',
+                'Drawer': 'Positive - زيادة في المدى الحركي الأمامي.'
+            }
+        };
+
+        function getHistory() { document.getElementById('result-area').innerHTML = "<b>رد المريض:</b> " + caseData.history; }
+        function askSymptoms() { document.getElementById('result-area').innerHTML = "<b>رد المريض:</b> " + caseData.symptoms; }
+        function doTest(test) { document.getElementById('result-area').innerHTML = "<b>نتيجة الفحص:</b> " + caseData.tests[test]; }
+
+        let time = 600;
+        const timerEl = document.getElementById('timer');
         setInterval(() => {
-            if(timeLeft > 0) {
-                timeLeft--;
-                let min = Math.floor(timeLeft/60);
-                let sec = timeLeft % 60;
-                document.getElementById('timer').innerText = `الوقت المتبقي: ${min}:${sec < 10 ? '0'+sec : sec}`;
+            if(time > 0) {
+                time--;
+                let m = Math.floor(time/60);
+                let s = time % 60;
+                timerEl.innerText = `⏳ الوقت المتبقي: ${m}:${s < 10 ? '0'+s : s}`;
             }
         }, 1000);
 
-        function examine(test) {
-            if(test === 'Lachman') {
-                document.getElementById('result').innerText = "النتيجة: Positive (Soft End Point) - في حركة غير طبيعية للقصبة.";
+        function finish() {
+            const diag = prompt("اكتب تشخيصك النهائي للحالة:");
+            if(diag && diag.toLowerCase().includes('acl') || diag.includes('صليبي')) {
+                alert("برافو يا دكتور! تشخيص صحيح. الحالة فعلاً ACL Tear. \nتم التقييم بواسطة Dr. Ashraf Alaa.");
             } else {
-                document.getElementById('result').innerText = "النتيجة: Negative - الاختبار لم يعطِ استجابة.";
+                alert("للأسف التشخيص غير دقيق. راجع ميكانيكية الإصابة واختبار Lachman.");
             }
-        }
-
-        function ask() {
-            document.getElementById('patient-talk').innerText = '"كنت بجري ولفيت فجأة وسمعت صوت طقة (Pop) والركبة ورمت فوراً!"';
         }
     </script>
 </body>
